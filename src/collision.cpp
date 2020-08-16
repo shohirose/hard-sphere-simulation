@@ -20,9 +20,9 @@ bool doCollide(const Eigen::Vector2d& x1, const Eigen::Vector2d& x2,
   return (det > 0) && (-(xv + std::sqrt(det)) > 0);
 }
 
-double collisionTime(const Eigen::Vector2d& x1, const Eigen::Vector2d& x2,
-                     const Eigen::Vector2d& v1, const Eigen::Vector2d& v2,
-                     double r1, double r2) {
+double calcCollisionTime(const Eigen::Vector2d& x1, const Eigen::Vector2d& x2,
+                         const Eigen::Vector2d& v1, const Eigen::Vector2d& v2,
+                         double r1, double r2) {
   using Eigen::Vector2d;
   Vector2d dx = x1 - x2;
   Vector2d dv = v1 - v2;
@@ -37,7 +37,7 @@ double collisionTime(const Eigen::Vector2d& x1, const Eigen::Vector2d& x2,
                    : std::numeric_limits<double>::max();
 }
 
-std::pair<NotAlignedVector2d, NotAlignedVector2d> velocitiesAfterCollision(
+std::pair<NotAlignedVector2d, NotAlignedVector2d> calcVelocitiesAfterCollision(
     const Eigen::Vector2d& v1, const Eigen::Vector2d& v2, double m1, double m2,
     double e) {
   const Eigen::Vector2d dv = v1 - v2;
@@ -46,7 +46,7 @@ std::pair<NotAlignedVector2d, NotAlignedVector2d> velocitiesAfterCollision(
   return {v1new, v2new};
 }
 
-std::vector<double> collisionTime(const ParticleSystem& particles) {
+std::vector<double> calcCollisionTime(const ParticleSystem& particles) {
   const auto numberOfParticles =
       static_cast<int64_t>(particles.numberOfParticles());
   std::vector<double> tc(numberOfParticles, std::numeric_limits<double>::max());
@@ -67,7 +67,7 @@ std::vector<double> collisionTime(const ParticleSystem& particles) {
       const auto r2 = r[j];
       auto& tc2 = tc[j];
 
-      const auto tc12 = collisionTime(x1, x2, v1, v2, r1, r2);
+      const auto tc12 = calcCollisionTime(x1, x2, v1, v2, r1, r2);
       if (tc12 < tc1) tc1 = tc12;
       if (tc12 < tc2) tc2 = tc12;
     }
