@@ -54,7 +54,6 @@ std::vector<double> calcCollisionTime(const ParticleSystem& particles) {
   const auto& v = particles.velocities;
   const auto& r = particles.radii;
 
-#pragma omp parallel for
   for (int64_t i = 0; i < numberOfParticles; ++i) {
     const auto& x1 = x[i];
     const auto& v1 = v[i];
