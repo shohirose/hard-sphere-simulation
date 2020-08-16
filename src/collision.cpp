@@ -19,7 +19,7 @@ bool doCollide(const Eigen::Ref<const Eigen::Vector2d>& x1,
   const auto rsum = r1 + r2;
   const auto det = xv * xv - vsqr * (xsqr - rsum * rsum);
 
-  return (det > 0) && (-(xv + std::sqrt(det)) > 0);
+  return (det >= 0) && (-(xv + std::sqrt(det)) > 0);
 }
 
 double calcCollisionTime(const Eigen::Ref<const Eigen::Vector2d>& x1,
@@ -37,8 +37,11 @@ double calcCollisionTime(const Eigen::Ref<const Eigen::Vector2d>& x1,
   const auto rsum = r1 + r2;
   const auto det = xv * xv - vsqr * (xsqr - rsum * rsum);
 
-  return (det > 0) ? -(xv + std::sqrt(det)) / vsqr
-                   : std::numeric_limits<double>::max();
+  if (det < 0) return std::numeric_limits<double>::max();
+
+  const auto collisionTime = -(xv + std::sqrt(det)) / vsqr;
+  return (collisionTime > 0) ? collisionTime
+                             : std::numeric_limits<double>::max();
 }
 
 std::pair<NotAlignedVector2d, NotAlignedVector2d> calcVelocitiesAfterCollision(
