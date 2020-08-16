@@ -4,12 +4,14 @@
 
 namespace shirose {
 
-bool doCollide(const Eigen::Vector2d& x1, const Eigen::Vector2d& x2,
-               const Eigen::Vector2d& v1, const Eigen::Vector2d& v2, double r1,
-               double r2) {
+bool doCollide(const Eigen::Ref<const Eigen::Vector2d>& x1,
+               const Eigen::Ref<const Eigen::Vector2d>& x2,
+               const Eigen::Ref<const Eigen::Vector2d>& v1,
+               const Eigen::Ref<const Eigen::Vector2d>& v2,  //
+               double r1, double r2) {
   using Eigen::Vector2d;
-  Vector2d dx = x1 - x2;
-  Vector2d dv = v1 - v2;
+  const Vector2d dx = x1 - x2;
+  const Vector2d dv = v1 - v2;
 
   const auto xv = dx.dot(dv);
   const auto vsqr = dv.squaredNorm();
@@ -20,12 +22,14 @@ bool doCollide(const Eigen::Vector2d& x1, const Eigen::Vector2d& x2,
   return (det > 0) && (-(xv + std::sqrt(det)) > 0);
 }
 
-double calcCollisionTime(const Eigen::Vector2d& x1, const Eigen::Vector2d& x2,
-                         const Eigen::Vector2d& v1, const Eigen::Vector2d& v2,
+double calcCollisionTime(const Eigen::Ref<const Eigen::Vector2d>& x1,
+                         const Eigen::Ref<const Eigen::Vector2d>& x2,
+                         const Eigen::Ref<const Eigen::Vector2d>& v1,
+                         const Eigen::Ref<const Eigen::Vector2d>& v2,  //
                          double r1, double r2) {
   using Eigen::Vector2d;
-  Vector2d dx = x1 - x2;
-  Vector2d dv = v1 - v2;
+  const Vector2d dx = x1 - x2;
+  const Vector2d dv = v1 - v2;
 
   const auto xv = dx.dot(dv);
   const auto vsqr = dv.squaredNorm();
@@ -38,7 +42,8 @@ double calcCollisionTime(const Eigen::Vector2d& x1, const Eigen::Vector2d& x2,
 }
 
 std::pair<NotAlignedVector2d, NotAlignedVector2d> calcVelocitiesAfterCollision(
-    const Eigen::Vector2d& v1, const Eigen::Vector2d& v2, double m1, double m2,
+    const Eigen::Ref<const Eigen::Vector2d>& v1,
+    const Eigen::Ref<const Eigen::Vector2d>& v2, double m1, double m2,
     double e) {
   const Eigen::Vector2d dv = v1 - v2;
   const NotAlignedVector2d v1new = v1 - (1 + e) * m2 / (m1 + m2) * dv;
