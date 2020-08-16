@@ -41,7 +41,7 @@ struct ParticleSystem {
   /// @brief Stores the current velocities and positions in the previous ones.
   void storePreviousTimeStep() noexcept {
     this->previousPositions = this->positions;
-    this->previousVelocities = this->previousVelocities;
+    this->previousVelocities = this->velocities;
   }
 };
 
