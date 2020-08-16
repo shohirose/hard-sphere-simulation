@@ -55,20 +55,19 @@ std::pair<NotAlignedVector2d, NotAlignedVector2d> calcVelocitiesAfterCollision(
 }
 
 std::vector<double> calcCollisionTime(const ParticleSystem& particles) {
-  const auto numberOfParticles =
-      static_cast<int64_t>(particles.numberOfParticles());
+  const auto numberOfParticles = particles.numberOfParticles();
   std::vector<double> tc(numberOfParticles, std::numeric_limits<double>::max());
   const auto& x = particles.positions;
   const auto& v = particles.velocities;
   const auto& r = particles.radii;
 
-  for (int64_t i = 0; i < numberOfParticles; ++i) {
+  for (size_t i = 0; i < numberOfParticles; ++i) {
     const auto& x1 = x[i];
     const auto& v1 = v[i];
     const auto r1 = r[i];
     auto& tc1 = tc[i];
 
-    for (int64_t j = i + 1; j < numberOfParticles; ++j) {
+    for (size_t j = i + 1; j < numberOfParticles; ++j) {
       const auto& x2 = x[j];
       const auto& v2 = v[j];
       const auto r2 = r[j];
