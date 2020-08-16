@@ -2,6 +2,7 @@
 #define SHIROSE_COLLISION_HPP
 
 #include <Eigen/Core>
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -30,13 +31,12 @@ bool doCollide(const Eigen::Ref<const Eigen::Vector2d>& x1,
 /// @param[in] v2 Velocity of particle 2
 /// @param[in] r1 Radius of particle 1
 /// @param[in] r2 Radius of particle 2
-///
-/// If two particles will not collide, the maximum value of double is returned.
-double calcCollisionTime(const Eigen::Ref<const Eigen::Vector2d>& x1,
-                         const Eigen::Ref<const Eigen::Vector2d>& x2,
-                         const Eigen::Ref<const Eigen::Vector2d>& v1,
-                         const Eigen::Ref<const Eigen::Vector2d>& v2,  //
-                         double r1, double r2);
+std::optional<double> calcCollisionTime(
+    const Eigen::Ref<const Eigen::Vector2d>& x1,
+    const Eigen::Ref<const Eigen::Vector2d>& x2,
+    const Eigen::Ref<const Eigen::Vector2d>& v1,
+    const Eigen::Ref<const Eigen::Vector2d>& v2,  //
+    double r1, double r2);
 
 /// @brief Computes collision times between particles.
 /// @param[in] particles Particles
