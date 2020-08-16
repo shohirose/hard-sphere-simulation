@@ -107,6 +107,8 @@ std::vector<double> calcCollisionTime(const ParticleSystem& particles) {
       }
     }
   }
+
+  return tc;
 }
 
 }  // namespace shirose
