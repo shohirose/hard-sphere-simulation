@@ -60,7 +60,7 @@ bool doCollide(const Eigen::Ref<const Eigen::Vector2d>& x1,
   return (det >= 0) && (-eq.b - std::sqrt(det) > 0);
 }
 
-std::optional<double> calcCollisionTime(
+std::pair<bool, double> calcTimeToCollision(
     const Eigen::Ref<const Eigen::Vector2d>& x1,
     const Eigen::Ref<const Eigen::Vector2d>& x2,
     const Eigen::Ref<const Eigen::Vector2d>& v1,
@@ -70,15 +70,15 @@ std::optional<double> calcCollisionTime(
   const auto det = calcDeterminant(eq);
 
   if (det < 0) {
-    return std::nullopt;
+    return {false, 0};
   }
 
   const auto collisionTime = (-eq.b - std::sqrt(det)) / eq.a;
 
   if (collisionTime > 0) {
-    return collisionTime;
+    return {true, collisionTime};
   } else {
-    return std::nullopt;
+    return {false, 0};
   }
 }
 
@@ -88,12 +88,12 @@ Pair<Eigen::Vector2d, Eigen::Vector2d> calcVelocityChanges(
     double e) {
   using Eigen::Vector2d;
   const Vector2d dv = v1 - v2;
-  const Vector2d dv1 = - (1 + e) * m2 / (m1 + m2) * dv;
+  const Vector2d dv1 = -(1 + e) * m2 / (m1 + m2) * dv;
   const Vector2d dv2 = (1 + e) * m1 / (m1 + m2) * dv;
   return {dv1, dv2};
 }
 
-Eigen::MatrixXd calcCollisionTimeMatrix(const ParticleSystem& particles) {
+Eigen::MatrixXd calcTimeToCollision(const ParticleSystem& particles) {
   const auto& x = particles.positions;
   const auto& v = particles.velocities;
   const auto& r = particles.radii;
@@ -118,12 +118,13 @@ Eigen::MatrixXd calcCollisionTimeMatrix(const ParticleSystem& particles) {
       const auto& v2 = v[i];
       const auto r2 = r[i];
 
-      const auto doCollide = calcCollisionTime(x1, x2, v1, v2, r1, r2);
+      const auto [doCollide, timeToCollide] =
+          calcTimeToCollision(x1, x2, v1, v2, r1, r2);
+          
       if (doCollide) {
-        const auto tc12 = doCollide.value();
-        if (tc12 < tc(i, j)) {
-          tc(i, j) = tc12;
-          tc(j, i) = tc12;
+        if (timeToCollide < tc(i, j)) {
+          tc(i, j) = timeToCollide;
+          tc(j, i) = timeToCollide;
         }
       }
     }

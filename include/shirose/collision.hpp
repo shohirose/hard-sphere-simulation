@@ -2,7 +2,6 @@
 #define SHIROSE_COLLISION_HPP
 
 #include <Eigen/Core>
-#include <optional>
 #include <utility>
 #include <vector>
 
@@ -26,16 +25,17 @@ bool doCollide(const Eigen::Ref<const Eigen::Vector2d>& x1,
                const Eigen::Ref<const Eigen::Vector2d>& v2,  //
                double r1, double r2);
 
-/// @brief Computes collision time of two particles.
+/// @brief Computes a time to the collision of two particles.
 /// @param[in] x1 Position of particle 1
 /// @param[in] x2 Position of particle 2
 /// @param[in] v1 Velocity of particle 1
 /// @param[in] v2 Velocity of particle 2
 /// @param[in] r1 Radius of particle 1
 /// @param[in] r2 Radius of particle 2
+/// @returns If two particles will collide and its time to collide
 ///
 /// This function assumes both particle positions are at the same time point.
-std::optional<double> calcCollisionTime(
+std::pair<bool, double> calcTimeToCollision(
     const Eigen::Ref<const Eigen::Vector2d>& x1,
     const Eigen::Ref<const Eigen::Vector2d>& x2,
     const Eigen::Ref<const Eigen::Vector2d>& v1,
@@ -47,7 +47,7 @@ std::optional<double> calcCollisionTime(
 ///
 /// If a particle will not collide, its collision time is set to the maximum
 /// value of double.
-Eigen::MatrixXd calcCollisionTimeMatrix(const ParticleSystem& particles);
+Eigen::MatrixXd calcTimeToCollision(const ParticleSystem& particles);
 
 /// @brief Comutes velocity changes due to a collision.
 /// @param[in] v1 Velocity of particle 1
