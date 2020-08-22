@@ -1,5 +1,9 @@
 #include "shirose/collision.hpp"
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif  // _OPENMP
+
 #include <limits>
 
 namespace shirose {
@@ -81,32 +85,48 @@ std::pair<NotAlignedVector2d, NotAlignedVector2d> calcVelocitiesAfterCollision(
 }
 
 std::vector<double> calcCollisionTime(const ParticleSystem& particles) {
-  const auto numberOfParticles = particles.numberOfParticles();
-  std::vector<double> tc(numberOfParticles, std::numeric_limits<double>::max());
   const auto& x = particles.positions;
   const auto& v = particles.velocities;
   const auto& r = particles.radii;
 
-  for (size_t i = 0; i < numberOfParticles; ++i) {
-    const auto& x1 = x[i];
-    const auto& v1 = v[i];
-    const auto r1 = r[i];
-    auto& tc1 = tc[i];
+  using Eigen::MatrixXd;
+  const auto numberOfParticles = static_cast<int64_t>(particles.numberOfParticles());
+  // Collision time matrix
+  MatrixXd tcMatrix = MatrixXd::Constant(numberOfParticles, numberOfParticles,
+                                         std::numeric_limits<double>::max());
 
-    for (size_t j = i + 1; j < numberOfParticles; ++j) {
-      const auto& x2 = x[j];
-      const auto& v2 = v[j];
-      const auto r2 = r[j];
-      auto& tc2 = tc[j];
+  #ifdef _OPENMP
+#pragma omp parallel for
+  #endif // _OPENMP
+  for (int64_t j = 0; j < numberOfParticles; ++j) {
+    const auto& x1 = x[j];
+    const auto& v1 = v[j];
+    const auto r1 = r[j];
 
-      const auto tc12opt = calcCollisionTime(x1, x2, v1, v2, r1, r2);
-      if (tc12opt) {
-        const auto tc12 = tc12opt.value();
-        if (tc12 < tc1) tc1 = tc12;
-        if (tc12 < tc2) tc2 = tc12;
+    for (int64_t i = j + 1; i < numberOfParticles; ++i) {
+      const auto& x2 = x[i];
+      const auto& v2 = v[i];
+      const auto r2 = r[i];
+
+      const auto doCollide = calcCollisionTime(x1, x2, v1, v2, r1, r2);
+      if (doCollide) {
+        const auto tc12 = doCollide.value();
+        if (tc12 < tcMatrix(i, j)) {
+          tcMatrix(i, j) = tc12;
+          tcMatrix(j, i) = tc12;
+        }
       }
     }
   }
+
+  // Collision time of each particle
+  std::vector<double> tc(numberOfParticles);
+
+  Eigen::Map<Eigen::VectorXd> tcMap(tc.data(), numberOfParticles);
+
+  // Collision time of each particle is the minimum value of each column of the
+  // collision time matrix.
+  tcMap = tcMatrix.colwise().minCoeff().transpose();
 
   return tc;
 }
