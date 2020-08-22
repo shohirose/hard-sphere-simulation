@@ -45,13 +45,14 @@ std::optional<double> calcCollisionTime(
 /// value of double.
 Eigen::MatrixXd calcCollisionTimeMatrix(const ParticleSystem& particles);
 
-/// @brief Comutes velocities after collision.
+/// @brief Comutes velocity changes due to a collision.
 /// @param[in] v1 Velocity of particle 1
 /// @param[in] v2 Velocity of particle 2
 /// @param[in] m1 Mass of particle 1
 /// @param[in] m2 Mass of particle 2
 /// @param[in] e Coefficient of restitution
-Pair<Eigen::Vector2d, Eigen::Vector2d> calcVelocitiesAfterCollision(
+/// @returns Velocity changes of particle 1 and 2
+Pair<Eigen::Vector2d, Eigen::Vector2d> calcVelocityChanges(
     const Eigen::Ref<const Eigen::Vector2d>& v1,
     const Eigen::Ref<const Eigen::Vector2d>& v2,  //
     double m1, double m2, double e);
