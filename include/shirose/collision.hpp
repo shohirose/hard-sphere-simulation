@@ -6,8 +6,8 @@
 #include <utility>
 #include <vector>
 
-#include "shirose/particle_system.hpp"
 #include "shirose/pair.hpp"
+#include "shirose/particle_system.hpp"
 
 namespace shirose {
 
@@ -18,6 +18,8 @@ namespace shirose {
 /// @param[in] v2 Velocity of particle 2
 /// @param[in] r1 Radius of particle 1
 /// @param[in] r2 Radius of particle 2
+///
+/// This function assumes both particle positions are at the same time point.
 bool doCollide(const Eigen::Ref<const Eigen::Vector2d>& x1,
                const Eigen::Ref<const Eigen::Vector2d>& x2,
                const Eigen::Ref<const Eigen::Vector2d>& v1,
@@ -31,6 +33,8 @@ bool doCollide(const Eigen::Ref<const Eigen::Vector2d>& x1,
 /// @param[in] v2 Velocity of particle 2
 /// @param[in] r1 Radius of particle 1
 /// @param[in] r2 Radius of particle 2
+///
+/// This function assumes both particle positions are at the same time point.
 std::optional<double> calcCollisionTime(
     const Eigen::Ref<const Eigen::Vector2d>& x1,
     const Eigen::Ref<const Eigen::Vector2d>& x2,
@@ -56,12 +60,6 @@ Pair<Eigen::Vector2d, Eigen::Vector2d> calcVelocityChanges(
     const Eigen::Ref<const Eigen::Vector2d>& v1,
     const Eigen::Ref<const Eigen::Vector2d>& v2,  //
     double m1, double m2, double e);
-
-/// @brief Computes positions after collision
-/// @param[in] v1old Velocity of particle 1 before collision
-/// @param[in] v2old Velocity of particle 2 before collision
-/// @param[in] v1new Velocity of particle 1 after collision
-/// @param[in] v2new Velocity of particle 2 after collision
 
 }  // namespace shirose
 
