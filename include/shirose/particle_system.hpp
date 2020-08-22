@@ -22,7 +22,7 @@ struct ParticleSystem {
   std::vector<double> radii;
 
    /// @brief Returns the number of particles.
-  std::size_t numberOfParticles() const noexcept {
+  std::size_t size() const noexcept {
     assert(this->positions.size() == this->velocities.size() &&
            this->positions.size() == this->masses.size() &&
            this->positions.size() == this->radii.size());
