@@ -82,13 +82,14 @@ std::optional<double> calcCollisionTime(
   }
 }
 
-std::pair<NotAlignedVector2d, NotAlignedVector2d> calcVelocitiesAfterCollision(
+Pair<Eigen::Vector2d, Eigen::Vector2d> calcVelocitiesAfterCollision(
     const Eigen::Ref<const Eigen::Vector2d>& v1,
     const Eigen::Ref<const Eigen::Vector2d>& v2, double m1, double m2,
     double e) {
   const Eigen::Vector2d dv = v1 - v2;
-  const NotAlignedVector2d v1new = v1 - (1 + e) * m2 / (m1 + m2) * dv;
-  const NotAlignedVector2d v2new = v2 + (1 + e) * m1 / (m1 + m2) * dv;
+  using Eigen::Vector2d;
+  const Vector2d v1new = v1 - (1 + e) * m2 / (m1 + m2) * dv;
+  const Vector2d v2new = v2 + (1 + e) * m1 / (m1 + m2) * dv;
   return {v1new, v2new};
 }
 

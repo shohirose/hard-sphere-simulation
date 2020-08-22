@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "shirose/particle_system.hpp"
-#include "shirose/vector.hpp"
+#include "shirose/pair.hpp"
 
 namespace shirose {
 
@@ -51,10 +51,16 @@ std::vector<double> calcCollisionTime(const ParticleSystem& particles);
 /// @param[in] m1 Mass of particle 1
 /// @param[in] m2 Mass of particle 2
 /// @param[in] e Coefficient of restitution
-std::pair<NotAlignedVector2d, NotAlignedVector2d> calcVelocitiesAfterCollision(
+Pair<Eigen::Vector2d, Eigen::Vector2d> calcVelocitiesAfterCollision(
     const Eigen::Ref<const Eigen::Vector2d>& v1,
     const Eigen::Ref<const Eigen::Vector2d>& v2,  //
     double m1, double m2, double e);
+
+/// @brief Computes positions after collision
+/// @param[in] v1old Velocity of particle 1 before collision
+/// @param[in] v2old Velocity of particle 2 before collision
+/// @param[in] v1new Velocity of particle 1 after collision
+/// @param[in] v2new Velocity of particle 2 after collision
 
 }  // namespace shirose
 
