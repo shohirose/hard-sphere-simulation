@@ -93,26 +93,27 @@ Pair<Eigen::Vector2d, Eigen::Vector2d> calcVelocitiesAfterCollision(
   return {v1new, v2new};
 }
 
-std::vector<double> calcCollisionTime(const ParticleSystem& particles) {
+Eigen::MatrixXd calcCollisionTimeMatrix(const ParticleSystem& particles) {
   const auto& x = particles.positions;
   const auto& v = particles.velocities;
   const auto& r = particles.radii;
 
   using Eigen::MatrixXd;
-  const auto numberOfParticles = static_cast<int64_t>(particles.numberOfParticles());
+  const auto rows = static_cast<int64_t>(particles.size());
+  const auto cols = rows;
   // Collision time matrix
-  MatrixXd tcMatrix = MatrixXd::Constant(numberOfParticles, numberOfParticles,
-                                         std::numeric_limits<double>::max());
+  MatrixXd tc =
+      MatrixXd::Constant(rows, cols, std::numeric_limits<double>::max());
 
-  #ifdef _OPENMP
+#ifdef _OPENMP
 #pragma omp parallel for
-  #endif // _OPENMP
-  for (int64_t j = 0; j < numberOfParticles; ++j) {
+#endif  // _OPENMP
+  for (int64_t j = 0; j < cols; ++j) {
     const auto& x1 = x[j];
     const auto& v1 = v[j];
     const auto r1 = r[j];
 
-    for (int64_t i = j + 1; i < numberOfParticles; ++i) {
+    for (int64_t i = j + 1; i < rows; ++i) {
       const auto& x2 = x[i];
       const auto& v2 = v[i];
       const auto r2 = r[i];
@@ -120,22 +121,13 @@ std::vector<double> calcCollisionTime(const ParticleSystem& particles) {
       const auto doCollide = calcCollisionTime(x1, x2, v1, v2, r1, r2);
       if (doCollide) {
         const auto tc12 = doCollide.value();
-        if (tc12 < tcMatrix(i, j)) {
-          tcMatrix(i, j) = tc12;
-          tcMatrix(j, i) = tc12;
+        if (tc12 < tc(i, j)) {
+          tc(i, j) = tc12;
+          tc(j, i) = tc12;
         }
       }
     }
   }
-
-  // Collision time of each particle
-  std::vector<double> tc(numberOfParticles);
-
-  Eigen::Map<Eigen::VectorXd> tcMap(tc.data(), numberOfParticles);
-
-  // Collision time of each particle is the minimum value of each column of the
-  // collision time matrix.
-  tcMap = tcMatrix.colwise().minCoeff().transpose();
 
   return tc;
 }

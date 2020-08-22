@@ -43,7 +43,7 @@ std::optional<double> calcCollisionTime(
 ///
 /// If a particle will not collide, its collision time is set to the maximum
 /// value of double.
-std::vector<double> calcCollisionTime(const ParticleSystem& particles);
+Eigen::MatrixXd calcCollisionTimeMatrix(const ParticleSystem& particles);
 
 /// @brief Comutes velocities after collision.
 /// @param[in] v1 Velocity of particle 1
