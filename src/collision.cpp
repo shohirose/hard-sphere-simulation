@@ -24,7 +24,15 @@ inline double calcDeterminant(const QuadraticEquation& eq) noexcept {
   return square(eq.b) - eq.a * eq.c;
 }
 
-QuadraticEquation convertToQuadraticEquation(
+/// @brief Converts the collision condition of two particles into a quadratic
+/// equation.
+/// @param[in] x1 Position of particle 1
+/// @param[in] x2 Position of particle 2
+/// @param[in] v1 Velocity of particle 1
+/// @param[in] v2 Velocity of particle 2
+/// @param[in] r1 Radius of particle 1
+/// @param[in] r2 Radius of particle 2
+inline QuadraticEquation convertToQuadraticEquation(
     const Eigen::Ref<const Eigen::Vector2d>& x1,
     const Eigen::Ref<const Eigen::Vector2d>& x2,
     const Eigen::Ref<const Eigen::Vector2d>& v1,
