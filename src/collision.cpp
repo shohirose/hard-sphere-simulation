@@ -120,12 +120,10 @@ Eigen::MatrixXd calcTimeToCollision(const ParticleSystem& particles) {
 
       const auto [doCollide, timeToCollide] =
           calcTimeToCollision(x1, x2, v1, v2, r1, r2);
-          
-      if (doCollide) {
-        if (timeToCollide < tc(i, j)) {
-          tc(i, j) = timeToCollide;
-          tc(j, i) = timeToCollide;
-        }
+
+      if (doCollide && (timeToCollide < tc(i, j))) {
+        tc(i, j) = timeToCollide;
+        tc(j, i) = timeToCollide;
       }
     }
   }
