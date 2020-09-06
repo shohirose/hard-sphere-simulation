@@ -48,6 +48,8 @@ inline QuadraticEquation convertToQuadraticEquation(
   return {a, b, c};
 }
 
+constexpr double eps = 1e-10;
+
 }  // anonymous namespace
 
 bool doCollide(const Eigen::Ref<const Eigen::Vector2d>& x1,
@@ -57,7 +59,8 @@ bool doCollide(const Eigen::Ref<const Eigen::Vector2d>& x1,
                double r1, double r2) {
   const auto eq = convertToQuadraticEquation(x1, x2, v1, v2, r1, r2);
   const auto det = calcDeterminant(eq);
-  return (det >= 0) && (-eq.b - std::sqrt(det) > 0);
+  const auto timeToCollision = (-eq.b - std::sqrt(det)) / eq.a;
+  return det >= 0 && timeToCollision > eps;
 }
 
 std::pair<bool, double> calcTimeToCollision(
@@ -73,10 +76,10 @@ std::pair<bool, double> calcTimeToCollision(
     return {false, 0};
   }
 
-  const auto collisionTime = (-eq.b - std::sqrt(det)) / eq.a;
+  const auto timeToCollision = (-eq.b - std::sqrt(det)) / eq.a;
 
-  if (collisionTime > 0) {
-    return {true, collisionTime};
+  if (timeToCollision > eps) {
+    return {true, timeToCollision};
   } else {
     return {false, 0};
   }
