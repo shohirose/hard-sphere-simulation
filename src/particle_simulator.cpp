@@ -23,7 +23,6 @@ void EventDrivenParticleSimulator::run() {
   const auto numParticles = static_cast<int64_t>(particles_->size());
 
   bool doUpdateCollisionTime = true;
-  bool doCollide = false;
 
   // Indices of a colliding particle pair
   std::ptrdiff_t i = 0;
@@ -31,11 +30,13 @@ void EventDrivenParticleSimulator::run() {
 
   double currentTime = startTime_;
   double oldTime = startTime_;
+  double deltaTime = currentTime - oldTime;
   double collisionTime = std::numeric_limits<double>::max();
 
+  // Time loop
   do {
     currentTime = calcCurrentTime(oldTime);
-    const auto deltaTime = currentTime - oldTime;
+    deltaTime = currentTime - oldTime;
 
     std::cout << "Current time: " << currentTime << " sec\n";
 
@@ -46,41 +47,38 @@ void EventDrivenParticleSimulator::run() {
     // collision time falls in the window of the current time step, i.e.
     // oldTime < collisionTime <= currentTime
     if (doUpdateCollisionTime) {
+      std::cout << "Computing time to collision\n";
       const auto timeToCollisionMatrix = calcTimeToCollision(*particles_);
       const auto timeToCollision = timeToCollisionMatrix.minCoeff(&i, &j);
       collisionTime = oldTime + timeToCollision;
     }
 
-    // Updates positions of all particles assuming there is no collision
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif _OPENMP
-    for (int64_t k = 0; k < numParticles; ++k) {
-      x[k] += v[k] * deltaTime;
-    }
-
     // Checks if the collision time falls in the current time-step window.
     if (collisionTime <= currentTime) {
-      doCollide = true;
-      doUpdateCollisionTime = true;
-    } else {
-      doCollide = false;
-      doUpdateCollisionTime = false;
-    }
+      std::cout << "Find a collision. Collision time: " << collisionTime
+                << " sec\n";
 
-    // Updates the colliding particles
-    if (doCollide) {
+      doUpdateCollisionTime = true;
+
+      // Move current time back to the collision time
+      currentTime = collisionTime;
+      deltaTime = currentTime - oldTime;
+
+      // Updates positions to the collision time
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif  // _OPENMP
+      for (int64_t k = 0; k < numParticles; ++k) {
+        x[k] += v[k] * deltaTime;
+      }
+
+      // Updates the velocities of colliding particles
       const auto [dv1, dv2] =
           calcVelocityChanges(v[i], v[j], m[i], m[j], restitutionCoeff_);
-
-      // Updates velocities
       v[i] += dv1;
       v[j] += dv2;
-
-      // Backtracked positions
-      const auto dt = currentTime - collisionTime;
-      x[i] += dv1 * dt;
-      x[j] += dv2 * dt;
+    } else {
+      doUpdateCollisionTime = false;
     }
 
     // Updates time
