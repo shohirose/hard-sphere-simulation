@@ -20,8 +20,24 @@ struct QuadraticEquation {
 
 inline double square(double x) noexcept { return x * x; }
 
+/// @brief Computes the determinant of a quadratic equation.
+/// @param[in] eq Quadratic equation
+/// @returns Determinant
 inline double calcDeterminant(const QuadraticEquation& eq) noexcept {
   return square(eq.b) - eq.a * eq.c;
+}
+
+/// @brief Computes time to collision from a quadratic equation
+/// @param[in] eq Quadratic equation
+/// @returns A pair of determinant and time to collision
+inline std::optional<double> calcTimeToCollision(
+    const QuadraticEquation& eq) noexcept {
+  const auto det = calcDeterminant(eq);
+  if (det >= 0) {
+    return -eq.b - std::sqrt(det) / eq.a;
+  } else {
+    return std::nullopt;
+  }
 }
 
 /// @brief Makes a quadratic equation which represents a collision condition of
@@ -58,31 +74,18 @@ bool doCollide(const Eigen::Ref<const Eigen::Vector2d>& x1,
                const Eigen::Ref<const Eigen::Vector2d>& v2,  //
                double r1, double r2) {
   const auto eq = makeQuadraticEquation(x1, x2, v1, v2, r1, r2);
-  const auto det = calcDeterminant(eq);
-  const auto timeToCollision = (-eq.b - std::sqrt(det)) / eq.a;
-  return det >= 0 && timeToCollision > eps;
+  const auto tc = calcTimeToCollision(eq);
+  return tc.has_value() && tc.value() > eps;
 }
 
-std::pair<bool, double> calcTimeToCollision(
+std::optional<double> calcTimeToCollision(
     const Eigen::Ref<const Eigen::Vector2d>& x1,
     const Eigen::Ref<const Eigen::Vector2d>& x2,
     const Eigen::Ref<const Eigen::Vector2d>& v1,
     const Eigen::Ref<const Eigen::Vector2d>& v2,  //
     double r1, double r2) {
   const auto eq = makeQuadraticEquation(x1, x2, v1, v2, r1, r2);
-  const auto det = calcDeterminant(eq);
-
-  if (det < 0) {
-    return {false, 0};
-  }
-
-  const auto timeToCollision = (-eq.b - std::sqrt(det)) / eq.a;
-
-  if (timeToCollision > eps) {
-    return {true, timeToCollision};
-  } else {
-    return {false, 0};
-  }
+  return calcTimeToCollision(eq);
 }
 
 Pair<Eigen::Vector2d, Eigen::Vector2d> calcVelocityChanges(
@@ -121,12 +124,12 @@ Eigen::MatrixXd calcTimeToCollision(const ParticleSystem& particles) {
       const auto& v2 = v[i];
       const auto r2 = r[i];
 
-      const auto [doCollide, timeToCollision] =
+      const auto tc12 =
           calcTimeToCollision(x1, x2, v1, v2, r1, r2);
 
-      if (doCollide && (timeToCollision < tc(i, j))) {
-        tc(i, j) = timeToCollision;
-        tc(j, i) = timeToCollision;
+      if (tc12 && (*tc12 < tc(i, j))) {
+        tc(i, j) = *tc12;
+        tc(j, i) = *tc12;
       }
     }
   }

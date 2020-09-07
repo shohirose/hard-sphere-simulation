@@ -2,7 +2,7 @@
 #define SHIROSE_COLLISION_HPP
 
 #include <Eigen/Core>
-#include <utility>
+#include <optional>
 #include <vector>
 
 #include "shirose/pair.hpp"
@@ -32,10 +32,10 @@ bool doCollide(const Eigen::Ref<const Eigen::Vector2d>& x1,
 /// @param[in] v2 Velocity of particle 2
 /// @param[in] r1 Radius of particle 1
 /// @param[in] r2 Radius of particle 2
-/// @returns If two particles will collide and its time to collide
+/// @returns Time to collision
 ///
 /// This function assumes both particle positions are at the same time point.
-std::pair<bool, double> calcTimeToCollision(
+std::optional<double> calcTimeToCollision(
     const Eigen::Ref<const Eigen::Vector2d>& x1,
     const Eigen::Ref<const Eigen::Vector2d>& x2,
     const Eigen::Ref<const Eigen::Vector2d>& v1,
