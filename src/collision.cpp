@@ -24,15 +24,15 @@ inline double calcDeterminant(const QuadraticEquation& eq) noexcept {
   return square(eq.b) - eq.a * eq.c;
 }
 
-/// @brief Converts the collision condition of two particles into a quadratic
-/// equation.
+/// @brief Makes a quadratic equation which represents a collision condition of
+/// two particles.
 /// @param[in] x1 Position of particle 1
 /// @param[in] x2 Position of particle 2
 /// @param[in] v1 Velocity of particle 1
 /// @param[in] v2 Velocity of particle 2
 /// @param[in] r1 Radius of particle 1
 /// @param[in] r2 Radius of particle 2
-inline QuadraticEquation convertToQuadraticEquation(
+inline QuadraticEquation makeQuadraticEquation(
     const Eigen::Ref<const Eigen::Vector2d>& x1,
     const Eigen::Ref<const Eigen::Vector2d>& x2,
     const Eigen::Ref<const Eigen::Vector2d>& v1,
@@ -57,7 +57,7 @@ bool doCollide(const Eigen::Ref<const Eigen::Vector2d>& x1,
                const Eigen::Ref<const Eigen::Vector2d>& v1,
                const Eigen::Ref<const Eigen::Vector2d>& v2,  //
                double r1, double r2) {
-  const auto eq = convertToQuadraticEquation(x1, x2, v1, v2, r1, r2);
+  const auto eq = makeQuadraticEquation(x1, x2, v1, v2, r1, r2);
   const auto det = calcDeterminant(eq);
   const auto timeToCollision = (-eq.b - std::sqrt(det)) / eq.a;
   return det >= 0 && timeToCollision > eps;
@@ -69,7 +69,7 @@ std::pair<bool, double> calcTimeToCollision(
     const Eigen::Ref<const Eigen::Vector2d>& v1,
     const Eigen::Ref<const Eigen::Vector2d>& v2,  //
     double r1, double r2) {
-  const auto eq = convertToQuadraticEquation(x1, x2, v1, v2, r1, r2);
+  const auto eq = makeQuadraticEquation(x1, x2, v1, v2, r1, r2);
   const auto det = calcDeterminant(eq);
 
   if (det < 0) {
