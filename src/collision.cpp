@@ -34,7 +34,7 @@ inline std::optional<double> calcTimeToCollision(
     const QuadraticEquation& eq) noexcept {
   const auto det = calcDeterminant(eq);
   if (det >= 0) {
-    return -eq.b - std::sqrt(det) / eq.a;
+    return (-eq.b - std::sqrt(det)) / eq.a;
   } else {
     return std::nullopt;
   }
